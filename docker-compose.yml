@@ -1,0 +1,62 @@
+version: '2'
+services:
+  web:
+    container_name: skoovepay.web
+    build:
+      context: _build/
+      dockerfile: web.docker
+    volumes:
+      - ./:/var/www
+    ports:
+      - "81:80"
+    links:
+      - app
+    restart: always
+  app:
+    container_name: skoovepay.app
+    build:
+      context: _build/
+      dockerfile: app.docker
+    volumes:
+      - ./:/var/www
+      - ./_supervisor/:/etc/supervisor/conf.d
+    links:
+      - db
+      - redis
+    environment:
+      - DB_PORT=3306
+      - DB_HOST=db
+    restart: always
+  db:
+    container_name: skoovepay.db
+    image: mysql:5.6
+    volumes:
+      - ./_data/:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=skoovepay"
+      - "MYSQL_USER=skoovepay"
+      - "MYSQL_PASSWORD=CABinNYQRwu8XqcRqxdxQEAG"
+      - "MYSQL_ROOT_PASSWORD=CABinNYQRwu8XqcRqxdxQEAG"
+    ports:
+        - "3306:3306"
+    restart: always
+  rabbitMQAdmin:
+    container_name: skoovepay.mqadmin
+    image: rabbitmq:3-management
+    ports:
+        - "15672:15672"
+        - "5672:5672"
+    restart: always
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+  redis:
+    container_name: skoovepay.redis
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./_redis:/data
+    restart: always
