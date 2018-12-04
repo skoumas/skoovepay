@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Redis;
 use Response;
 use Validator;
 
+use App\Payment;
+
 class PaymentController extends Controller
 {
  	public function index(Request $request) {
@@ -21,11 +23,14 @@ class PaymentController extends Controller
 		$amount = json_decode($request->getContent())->amount;
 
 		// Send to Redis first for quick calculations
-		Redis::set('payment_' . $amount, $amount, 'EX', 1200);
+		//Redis::set('payment_' . $amount, $amount, 'EX', 1200);
 
 		// Send to the Queue and then to the database (MYSQL)
-		ProcessPayment::dispatch($amount);
-
+		//ProcessPayment::dispatch($amount);
+		$payment = new Payment();
+		$payment->amount = $amount;
+		$payment->save();
+		
 		// Return a 201 created status code
 		return response(null, 201);
 	}

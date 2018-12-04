@@ -16,3 +16,4 @@ yarn-error.log
 _data
 _redis
 _rabbit
+_stresstest/node_modules

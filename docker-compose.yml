@@ -1,7 +1,7 @@
 version: '2'
 services:
   web:
-    container_name: skoovepay.web
+    container_name: sp.web
     build:
       context: _build/
       dockerfile: web.docker
@@ -11,15 +11,18 @@ services:
       - "81:80"
     links:
       - app
+    networks:
+      - app-network
     restart: always
   app:
-    container_name: skoovepay.app
+    container_name: sp.app
     build:
       context: _build/
       dockerfile: app.docker
     volumes:
       - ./:/var/www
-      - ./_supervisor/:/etc/supervisor/conf.d
+    networks:
+      - app-network
     links:
       - db
       - redis
@@ -28,7 +31,7 @@ services:
       - DB_HOST=db
     restart: always
   db:
-    container_name: skoovepay.db
+    container_name: sp.db
     image: mysql:5.6
     volumes:
       - ./_data/:/var/lib/mysql
@@ -39,9 +42,11 @@ services:
       - "MYSQL_ROOT_PASSWORD=CABinNYQRwu8XqcRqxdxQEAG"
     ports:
         - "3306:3306"
+    networks:
+      - app-network
     restart: always
-  rabbitMQAdmin:
-    container_name: skoovepay.mqadmin
+  rabbitmq:
+    container_name: sp.rabbitmq
     image: rabbitmq:3-management
     ports:
         - "15672:15672"
@@ -52,11 +57,49 @@ services:
       RABBITMQ_DEFAULT_USER: "rabbitmq"
       RABBITMQ_DEFAULT_PASS: "rabbitmq"
       RABBITMQ_DEFAULT_VHOST: "/"
+    networks:
+      - app-network
   redis:
-    container_name: skoovepay.redis
+    container_name: sp.redis
     image: redis
     ports:
       - "6379:6379"
+    networks:
+      - app-network
     volumes:
       - ./_redis:/data
     restart: always
+  consumer:
+     build:  _build/_consumer
+     container_name: sp.consumer
+     restart: always
+     volumes:
+       - ./_consumer:/usr/src/app/src
+     ports:
+       - "8082:8080"
+     networks:
+      - app-network
+     links:
+       - rabbitmq
+       - redis
+  producer:
+     build:  _build/_producer
+     container_name: sp.producer
+     restart: always
+     volumes:
+       - ./_producer:/usr/src/app/src
+     ports:
+       - "8080:8080"
+     networks:
+      - app-network
+     links:
+       - rabbitmq
+       - web
+  # rabbitmq:
+  #   container_name: skoovepay.rabbitmq
+  #   image: rabbitmq:3.7.4
+  #   networks:
+  #     - app-network
+networks:
+  app-network:
+    driver: bridge

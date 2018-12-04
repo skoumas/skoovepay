@@ -1,0 +1,19 @@
+{
+  "name": "skoovepay-producer",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Georgios Papanikolaou <skoumas.net@gmail.com>",
+  "main": "src/server.js",
+  "scripts": {
+	"start": "nodemon src/server.js localhost 8080"
+  },
+  "dependencies": {
+    "express": "^4.16.1",
+	"nodemon": "^1.18.7",
+	"amqplib": "^0.5.3",
+	"redis": "^2.8.0",
+	"axios": "^0.18.0",
+	"mysql": "^2.16.0"
+  },
+  "license": "ISC"
+}

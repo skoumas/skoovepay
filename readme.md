@@ -1,12 +1,14 @@
 ## Introduction
 This is the test for Skoove.
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications.
+- There are different ways
 
-## Learning Laravel
+## Instalation
+- Please run docker-compose at your terminal
+- Server is at http://localhost:81/
+-
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of any modern web application framework, making it a breeze to get started learning the framework.
 
-## Laravel Sponsors
+## Forward
 We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell):
 
 - **[Vehikl](https://vehikl.com/)**
