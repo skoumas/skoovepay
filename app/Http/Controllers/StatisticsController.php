@@ -19,10 +19,13 @@ class StatisticsController extends Controller
 	}
 
 	private function method1() {
+		// $list = Redis::lrange("payments",0,-1);
 		$keys = Redis::keys("*");
+
 		$sum = 0;
 		forEach($keys as $key) {
-			if (strpos($key, 'payment') !== false) {
+
+			if (strpos($key, 'p_') !== false) {
 				if(isset(explode("_",$key)[2])) {
 					$amount = explode("_",$key)[2];
 					$sum = $sum + floatval($amount);
@@ -33,7 +36,6 @@ class StatisticsController extends Controller
 			$average = $sum / count($keys);
 		else
 			$average = 0;
-			
 		$response = [
 			"total_amount"=>$sum,
 			"avg_amount"=>$average

@@ -14,11 +14,7 @@ app.use(bodyParser.json());
 amqp.connect('amqp://rabbitmq:rabbitmq@rabbitmq', function(err, conn) {
 app.post('/payment', (req, res) => {
 		if (err) {
-			console.log(err);
-			res.send(" " + err);
-			console.log("here" + req.body.amount);
-
-
+			res.sendStatus(500);
 		} else {
 			if (req.body.amount==undefined || req.body == undefined ) {
 				res.status(400);
@@ -32,10 +28,15 @@ app.post('/payment', (req, res) => {
 				ch.assertQueue(q, {durable: false});
 				ch.sendToQueue(q, new Buffer(amount.toString()));
 				var redis = require('redis');
-				var client = redis.createClient("6379","redis"); // this creates a new client
+				var client = redis.createClient("6379","redis");
 				client.on('connect', function() {
 					let timestamp = Math.floor(Date.now() / 1000);
-					client.set('payment_' + timestamp +  "_" + amount.toString(), amount.toString(), 'EX', 1200);
+					// The better way is to use lpush and store in a list but we are going to make use of the EX setting in this eaxmple
+					//client.lpush('payments', amount.toString())
+					client.incr('id', function(err, id) {
+					    client.set('p_' + id +  "_" + amount.toString(), amount.toString(), 'EX', 1200);
+					});
+
 				});
 				res.sendStatus(201);
 				//res.send("ok");
