@@ -3,20 +3,21 @@ This is the test for Skoove.
 The system should be able to handle hundreds of requests per second and should be able to access statistics once every five seconds. With the use of REDIS we don't have to wait for statistics as they come straight away.
 
 ## How to Run
-- Have docker and docker compose at your machine
+- Have docker and docker compose installed at your machine
 - Run docker-compose up -d
-- Connect to the database and insert the .sql file under the /sql folder. That file should create three SQL tables ready to be used.
+- Connect to the database at port 3306 with the settings in docker-compose.yml and insert the .sql file under the /sql folder. That file should create three SQL tables ready to be used.
 - The _ consumer and _ producer NODEJS servers will start in 10 seconds after the docker-compose initiated to ensure that RABBITMQ is up and running.
-- Go to POST http://0.0.0.0:8082/payment and make a {amount: number} request using {header: 'content-type':'application/json'}. If the request is in bad format you should get the proper response.
+- Go to POST http://0.0.0.0:8082/payment and make a {amount: number} request using {header: 'content-type':'application/json'}. If the request is in bad format you should get wrong format reqponse.
 - You can also make the same POST request at http://0.0.0.0:8081/payment. That request will go through LARAVEL directly.
 - Go to GET http://0.0.0.0:81/statistics to retrieve statistics (of the last 20 min payments).
 - Go to GET http://0.0.0.0:8082/statistics to retrieve statistics using the nodejs Version (of the last 20 min payments).
 - The stresstest.jmx will provide you with the JMeter test file ready setup for your testing.
 
 ## End Points
-- GET http://0.0.0.0:81/statistics ( Laravel Statistics )
+- GET http://0.0.0.0:81/statistics   ( Laravel Statistics )
 - GET http://0.0.0.0:8082/statistics ( Nodejs Statistics )
-- POST http://0.0.0.0:8082/payment ( Push new payment )
+- POST http://0.0.0.0:8082/payment   ( Nodejs CREATE payment )
+- POST http://0.0.0.0:81/payment     ( Laravel CREATE payment )
 
 ## A bit more about the approach to this problem
 ### First Approach
@@ -43,7 +44,7 @@ The second approach was much more faster and stable.
 ### TODOS
 - Replace the Laravel Keys with an actual list instead. Or use the HSET method to store all the payment information.
 
-## Flush Redis
-To FLUSH the redis please run:
+## Flush REDIS
+To FLUSH the REDIS please run:
 - docker exec -it sp.redis bash
 - redis-cli flushall
