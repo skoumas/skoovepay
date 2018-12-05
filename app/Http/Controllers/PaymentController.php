@@ -23,33 +23,32 @@ class PaymentController extends Controller
 		$amount = json_decode($request->getContent())->amount;
 
 		// Send to Redis first for quick calculations
-		//Redis::set('payment_' . $amount, $amount, 'EX', 1200);
+		Redis::incr("counter");
+		Redis::set('p_' . Redis::get("counter") . "_" . $amount , $amount, 'EX', 1200);
 
+		// OLDER Solution
 		// Send to the Queue and then to the database (MYSQL)
 		//ProcessPayment::dispatch($amount);
+
 		$payment = new Payment();
 		$payment->amount = $amount;
 		$payment->save();
-		
+
 		// Return a 201 created status code
 		return response(null, 201);
 	}
 
 	private function checkFormat($request) {
-
 		 if($request->header('Content-Type')!=='application/json') {
 			return false;
 		}
-
 		$validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0'
         ]);
-
         return (!$validator->fails());
 	}
 
 	private function wrongFormat() {
-
 		return (Response::json(array(
 			'code'      =>  400,
 			'message'   =>  "Wrong format"
