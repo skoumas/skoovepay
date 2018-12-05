@@ -2,6 +2,8 @@
 This is the test for Skoove.
 The system should be able to handle hundreds of requests per second and should be able to access statistics once every five seconds. With the use of REDIS we don't have to wait for statistics as they come straight away.
 
+Should there be any issues or questions please contact: +852 60170180 (whatsapp also possible) or skoumas.com@gmail.com
+
 ## How to Run
 - Have docker and docker compose installed at your machine
 - Run docker-compose up -d
