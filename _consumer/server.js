@@ -21,7 +21,6 @@ app.post('/payment', (req, res) => {
 				res.json({"error":'Wrong format'});
 			 	process.exit(0);
 			}
-
 			conn.createChannel(function(err, ch) {
 				var q = 'payment';
 				var amount = req.body.amount;
@@ -36,15 +35,50 @@ app.post('/payment', (req, res) => {
 					client.incr('id', function(err, id) {
 					    client.set('p_' + id +  "_" + amount.toString(), amount.toString(), 'EX', 1200);
 					});
-
 				});
+				client.end();
 				res.sendStatus(201);
-				//res.send("ok");
 			});
-		 	//setTimeout(function() { conn.close(); process.exit(0);  }, 500);
 		}
 	});
 });
 
+
+
+app.get('/statistics', (req, res) => {
+	var redis = require('redis');
+	var client = redis.createClient("6379","redis");
+	client.keys('*', function (err, keys) {
+		if (err) return console.log(err);
+		function getData(keys) {
+			return new Promise((resolve, reject)=>{
+				let sum = 0;
+				let count = 0;
+				async function asyncForEach(array, callback) {
+					for (let index = 0; index < array.length; index++) {
+						await callback(array[index], index, array);
+					}
+				}
+				asyncForEach(keys,function(key) {
+					if (key.includes("p_")){
+						count++;
+						sum = sum + parseInt(key.split("_")[2]);
+					}
+				});
+				setTimeout(function(){
+					resolve({sum:sum,count:count});
+				},20);
+	   		})
+		}
+		getData(keys)
+	    .then(result => {
+			client.end();
+			res.json({
+				"total_amount": result.sum,
+				"avg_amount": result.count
+			});
+		})
+	});
+});
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);

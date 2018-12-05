@@ -73,9 +73,6 @@ services:
      build:  _build/_consumer
      container_name: sp.consumer
      restart: always
-     depends_on:
-       - rabbitmq
-       - redis
      volumes:
        - ./_consumer:/usr/src/app/src
      ports:
@@ -89,9 +86,6 @@ services:
      build:  _build/_producer
      container_name: sp.producer
      restart: always
-     depends_on:
-       - rabbitmq
-       - web
      volumes:
        - ./_producer:/usr/src/app/src
      ports:
