@@ -11,4 +11,5 @@
 |
 */
 Route::post('/payment', 'PaymentController@index');
+Route::post('/payment_no_redis', 'PaymentController@indexNoRedis');
 Route::get('/statistics', 'StatisticsController@index');

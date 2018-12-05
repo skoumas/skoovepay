@@ -12,6 +12,10 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 amqp.connect('amqp://rabbitmq:rabbitmq@rabbitmq', function(err, conn) {
+
+/**
+ * Where the payment is first stored into redis and then sent into rabbitMQ
+ */
 app.post('/payment', (req, res) => {
 		if (err) {
 			res.sendStatus(500);
@@ -43,8 +47,9 @@ app.post('/payment', (req, res) => {
 	});
 });
 
-
-
+/**
+ * We retrieve all the keys from REDIS here and we compute them into statistic results.
+ */
 app.get('/statistics', (req, res) => {
 	var redis = require('redis');
 	var client = redis.createClient("6379","redis");

@@ -14,6 +14,12 @@ use App\Payment;
 
 class PaymentController extends Controller
 {
+	/**
+	* Saves the payment into redis for quick stats and also into the database.
+	*
+	* @param Request   $request  The HTTP Request
+	* @return Response
+	*/
  	public function index(Request $request) {
 
 	    if (!$this->checkFormat($request)) {
@@ -38,6 +44,33 @@ class PaymentController extends Controller
 		return response(null, 201);
 	}
 
+	/**
+	* This function is called only through the _producer while processing the queue.
+	*
+	* @param Request   $request  The HTTP Request
+	* @return Response
+	*/
+	public function indexNoRedis(Request $request) {
+
+		if (!$this->checkFormat($request)) {
+			return $this->wrongFormat();
+		}
+		// We should be able to use this command safely now.
+		$amount = json_decode($request->getContent())->amount;
+		$payment = new Payment();
+		$payment->amount = $amount;
+		$payment->save();
+
+		// Return a 201 created status code
+		return response(null, 201);
+	}
+
+	/**
+	* Checks that the format of the request is proper
+	*
+	* @param Request   $request  The HTTP Request
+	* @return Boolean
+	*/
 	private function checkFormat($request) {
 		 if($request->header('Content-Type')!=='application/json') {
 			return false;
@@ -48,6 +81,11 @@ class PaymentController extends Controller
         return (!$validator->fails());
 	}
 
+	/**
+	* Returns a wrong format HTTP response.
+	*
+	* @return Response
+	*/
 	private function wrongFormat() {
 		return (Response::json(array(
 			'code'      =>  400,
