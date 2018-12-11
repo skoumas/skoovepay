@@ -11,12 +11,11 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-amqp.connect('amqp://rabbitmq:rabbitmq@rabbitmq', function(err, conn) {
-
 /**
  * Where the payment is first stored into redis and then sent into rabbitMQ
  */
 app.post('/payment', (req, res) => {
+		amqp.connect('amqp://rabbitmq:rabbitmq@rabbitmq', function(err, conn) {
 		if (err) {
 			res.sendStatus(500);
 		} else {

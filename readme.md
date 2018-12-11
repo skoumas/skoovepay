@@ -20,6 +20,16 @@ Should there be any issues or questions please contact: +852 60170180 or skoumas
 - GET http://0.0.0.0:8082/statistics ( Nodejs Statistics )
 - POST http://0.0.0.0:8082/payment   ( Nodejs CREATE payment )
 - POST http://0.0.0.0:81/payment     ( Laravel CREATE payment )
+- POST http://0.0.0.0:81/payment_no_redis ( Laravel CREATE payment while skipping saving to REDIS )
+
+## Docker Compose Containers
+- sp.rabbitmq: the message broker.
+- sp.db: for storing data permanently.
+- sp.app: The Laravel application.
+- sp.web: The NGINX server that exposes the APP application.
+- sp.consumer: The NodeJS Server that is used for the /payment and /statistics requests that communicates with RabbitMQ.
+- sp.producer: The NodeJS Server that executes the rabbitMQ Queue.
+- sp.redis: Storing payments here temporally with an expiration of 1200seconds (20 minutes) for fast statistics
 
 ## A bit more about the approach to this problem
 ### First Approach
